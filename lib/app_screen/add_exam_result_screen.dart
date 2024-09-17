@@ -5,6 +5,9 @@ import '../model/student.dart';
 import '../model/course.dart';
 import 'package:http/http.dart' as http;
 
+// Define a constant for the base URL
+const String baseUrl = 'http://192.168.84.209/api';
+
 class AddExamResultScreen extends StatefulWidget {
   const AddExamResultScreen({super.key});
 
@@ -36,8 +39,7 @@ class _AddExamResultScreenState extends State<AddExamResultScreen> {
   }
 
   Future<List<Student>> fetchStudents() async {
-    final response =
-        await http.get(Uri.parse('http://192.168.149.209/api/student.php'));
+    final response = await http.get(Uri.parse('$baseUrl/student.php'));
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((json) => Student.fromJson(json)).toList();
@@ -47,8 +49,7 @@ class _AddExamResultScreenState extends State<AddExamResultScreen> {
   }
 
   Future<List<Course>> fetchCourses() async {
-    final response =
-        await http.get(Uri.parse('http://192.168.149.209/api/course.php'));
+    final response = await http.get(Uri.parse('$baseUrl/course.php'));
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((json) => Course.fromJson(json)).toList();
@@ -59,7 +60,7 @@ class _AddExamResultScreenState extends State<AddExamResultScreen> {
 
   Future<int> addExamResult(ExamResult examResult) async {
     final response = await http.post(
-      Uri.parse('http://192.168.149.209/api/exam_result.php'),
+      Uri.parse('$baseUrl/exam_result.php'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

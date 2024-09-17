@@ -5,6 +5,9 @@ import '../model/student.dart';
 import '../model/course.dart';
 import 'package:http/http.dart' as http;
 
+// สร้างตัวแปรสำหรับ IP address ไว้ด้านบนเพื่อให้เปลี่ยนได้ง่าย
+const String apiBaseUrl = 'http://192.168.84.209';
+
 class EditExamResultScreen extends StatefulWidget {
   const EditExamResultScreen({super.key});
 
@@ -36,68 +39,86 @@ class _EditExamResultScreenState extends State<EditExamResultScreen> {
   }
 
   Future<List<Student>> fetchStudents() async {
-    final response =
-        await http.get(Uri.parse('http://192.168.149.209/api/student.php'));
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => Student.fromJson(json)).toList();
-    } else {
-      throw Exception('Failed to load students');
+    try {
+      final response =
+          await http.get(Uri.parse('$apiBaseUrl/api/student.php'));
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((json) => Student.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load students. Status Code: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to load students: $e');
     }
   }
 
   Future<List<Course>> fetchCourses() async {
-    final response =
-        await http.get(Uri.parse('http://192.168.149.209/api/course.php'));
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => Course.fromJson(json)).toList();
-    } else {
-      throw Exception('Failed to load courses');
+    try {
+      final response =
+          await http.get(Uri.parse('$apiBaseUrl/api/course.php'));
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((json) => Course.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load courses. Status Code: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to load courses: $e');
     }
   }
 
   Future<int> addExamResult(ExamResult examResult) async {
-    final response = await http.post(
-      Uri.parse('http://192.168.149.209/api/exam_result.php'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, dynamic>{
-        'student_code': examResult.studentCode,
-        'course_code': examResult.courseCode,
-        'point': examResult.point,
-      }),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('$apiBaseUrl/api/exam_result.php'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'student_code': examResult.studentCode,
+          'course_code': examResult.courseCode,
+          'point': examResult.point,
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      return response.statusCode;
-    } else {
-      throw Exception('Failed to add exam result.');
+      if (response.statusCode == 200) {
+        return response.statusCode;
+      } else {
+        throw Exception('Failed to add exam result. Status Code: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error adding exam result: $e');
     }
   }
 
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       if (selectedStudentCode != null && selectedCourseCode != null) {
-        ExamResult newExamResult = ExamResult(
-          studentCode: selectedStudentCode!,
-          courseCode: selectedCourseCode!,
-          point: double.parse(pointController.text),
-        );
-
-        int result = await addExamResult(newExamResult);
-
-        if (result == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Exam result added successfully!')),
+        try {
+          ExamResult newExamResult = ExamResult(
+            studentCode: selectedStudentCode!,
+            courseCode: selectedCourseCode!,
+            point: double.parse(pointController.text),
           );
-          Navigator.pop(context);
-        } else {
+
+          int result = await addExamResult(newExamResult);
+
+          if (result == 200) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Exam result added successfully!')),
+            );
+            Navigator.pop(context);
+          }
+        } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to add exam result.')),
+            SnackBar(content: Text('Failed to add exam result: $e')),
           );
         }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select both student and course.')),
+        );
       }
     }
   }

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../model/student.dart'; // Make sure this path is correct
 import 'package:http/http.dart' as http;
 
+// Define a constant for the base URL
+const String baseUrl = 'http://192.168.84.209/api';
+
 class AddStudentScreen extends StatefulWidget {
   const AddStudentScreen({super.key});
 
@@ -104,7 +107,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
 
 Future<int> addStudent(Student student) async {
   final response = await http.post(
-    Uri.parse('http://192.168.149.209/api/student.php'),
+    Uri.parse('$baseUrl/student.php'), // Use the base URL here
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },

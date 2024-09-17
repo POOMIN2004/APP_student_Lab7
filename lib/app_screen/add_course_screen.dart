@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../model/course.dart'; // Ensure the correct path to your model
 import 'package:http/http.dart' as http;
 
+// Create a variable for the IP address
+const String apiBaseUrl = 'http://192.168.84.209'; 
+
 class AddCourseScreen extends StatefulWidget {
   const AddCourseScreen({super.key});
 
@@ -105,7 +108,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
 
 Future<int> addCourse(Course course) async {
   final response = await http.post(
-    Uri.parse('http://192.168.149.209/api/course.php'),
+    Uri.parse('$apiBaseUrl/api/course.php'), // Use the IP variable here
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },

@@ -196,7 +196,7 @@ class _StudentScreenState extends State<StudentScreen> {
 Future<List<Student>> fetchStudents() async {
   // ทำการดึงข้อมูลจาก server ตาม url ที่กำหนด
   final response =
-      await http.get(Uri.parse('http://192.168.149.209/api/student.php'));
+      await http.get(Uri.parse('http://192.168.84.209/api/student.php'));
 
   // เมื่อมีข้อมูลกลับมา
   if (response.statusCode == 200) {
@@ -213,7 +213,7 @@ Future<List<Student>> fetchStudents() async {
 Future<int> deleteStudent(Student student) async {
   final response = await http.delete(
     Uri.parse(
-        'http://192.168.149.209/api/student.php?student_code=${student.studentCode}'),
+        'http://192.168.84.209/api/student.php?student_code=${student.studentCode}'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },

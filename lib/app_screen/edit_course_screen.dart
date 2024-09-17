@@ -4,15 +4,18 @@ import 'package:flutter/material.dart';
 import '../model/course.dart';
 import 'package:http/http.dart' as http;
 
+// Define a constant for the base URL
+const String baseUrl = 'http://192.168.84.209/api';
+
 class EditCourseScreen extends StatefulWidget {
   final Course? course;
   const EditCourseScreen({super.key, this.course});
 
   @override
-  State<EditCourseScreen> createState() => _EditStudentScreenState();
+  State<EditCourseScreen> createState() => _EditCourseScreenState();
 }
 
-class _EditStudentScreenState extends State<EditCourseScreen> {
+class _EditCourseScreenState extends State<EditCourseScreen> {
   late Course course;
   final TextEditingController nameController = TextEditingController();
   final TextEditingController codeController = TextEditingController();
@@ -112,7 +115,7 @@ class _EditStudentScreenState extends State<EditCourseScreen> {
 
 Future<int> updateCourse(Course course) async {
   final response = await http.put(
-    Uri.parse('http://192.168.149.209/api/course.php'),
+    Uri.parse('$baseUrl/course.php'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },

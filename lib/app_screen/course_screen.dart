@@ -9,6 +9,9 @@ import 'package:http/http.dart' as http;
 
 import '../model/course.dart';
 
+// Define a constant for the base URL
+const String baseUrl = 'http://192.168.84.209/api';
+
 class CourseScreen extends StatefulWidget {
   const CourseScreen({super.key});
 
@@ -42,7 +45,7 @@ class _CourseScreenState extends State<CourseScreen> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddCourseScreen(),
+                    builder: (context) => const AddCourseScreen(),
                   ));
             },
             icon: const Icon(Icons.add),
@@ -77,8 +80,7 @@ class _CourseScreenState extends State<CourseScreen> {
                             itemBuilder: (context, index) {
                               return ListTile(
                                 title: Text(snapshot.data![index].courseName),
-                                subtitle:
-                                    Text(snapshot.data![index].courseCode),
+                                subtitle: Text(snapshot.data![index].courseCode),
                                 trailing: Wrap(
                                   children: [
                                     IconButton(
@@ -179,8 +181,7 @@ class _CourseScreenState extends State<CourseScreen> {
 }
 
 Future<List<Course>> fetchCourses() async {
-  final response =
-      await http.get(Uri.parse('http://192.168.149.209/api/course.php'));
+  final response = await http.get(Uri.parse('$baseUrl/course.php'));
 
   if (response.statusCode == 200) {
     return compute(parseCourses, response.body);
@@ -191,8 +192,7 @@ Future<List<Course>> fetchCourses() async {
 
 Future<void> deleteCourse(Course course) async {
   final response = await http.delete(
-    Uri.parse(
-        'http://192.168.149.209/api/course.php?course_code=${course.courseCode}'),
+    Uri.parse('$baseUrl/course.php?course_code=${course.courseCode}'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
@@ -205,8 +205,7 @@ Future<void> deleteCourse(Course course) async {
 
 Future<void> updateCourse(Course course) async {
   final response = await http.put(
-    Uri.parse(
-        'http://192.168.149.209/api/course.php?course_code=${course.courseCode}'),
+    Uri.parse('$baseUrl/course.php?course_code=${course.courseCode}'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },

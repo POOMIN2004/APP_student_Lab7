@@ -110,7 +110,7 @@ class _MenuScreenState extends State<MenuScreen> {
 Future<List<Course>> fetchCourses() async {
   // ทำการดึงข้อมูลจาก server ตาม url ที่กำหนด
   final response =
-      await http.get(Uri.parse('http://192.168.149.209/api/course.php'));
+      await http.get(Uri.parse('http://192.168.84.209/api/course.php'));
 
   // เมื่อมีข้อมูลกลับมา
   if (response.statusCode == 200) {

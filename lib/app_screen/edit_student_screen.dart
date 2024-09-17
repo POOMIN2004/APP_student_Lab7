@@ -1,8 +1,10 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import '../model/student.dart';
 import 'package:http/http.dart' as http;
+
+// สร้างตัวแปร `apiBaseUrl` สำหรับ URL ของ API
+const String apiBaseUrl = 'http://192.168.84.209';
 
 class EditStudentScreen extends StatefulWidget {
   final Student? student;
@@ -23,12 +25,16 @@ class _EditStudentScreenState extends State<EditStudentScreen> {
 
   @override
   void initState() {
-    print("initState"); // สำหรับทดสอบ
     super.initState();
-    student = widget.student!;
-    codeController.text = student!.studentCode;
-    nameController.text = student!.studentName;
-    dropdownValue = student!.gender;
+    if (widget.student != null) {
+      student = widget.student!;
+      codeController.text = student!.studentCode;
+      nameController.text = student!.studentName;
+      dropdownValue = student!.gender;
+    } else {
+      // Handle the case where student data is null
+      print('No student data provided');
+    }
   }
 
   @override
@@ -38,19 +44,36 @@ class _EditStudentScreenState extends State<EditStudentScreen> {
         title: const Text("Edit Student"),
         actions: [
           IconButton(
-              onPressed: () async {
-                int rt = await updateStudent(Student(
+            onPressed: () async {
+              try {
+                if (_validateInput()) {
+                  int result = await updateStudent(Student(
                     studentCode: student!.studentCode,
                     studentName: nameController.text,
-                    gender: dropdownValue));
-                if (rt != 0) {
-                  Navigator.pop(context);
+                    gender: dropdownValue,
+                  ));
+                  if (result == 200) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Student updated successfully')),
+                    );
+                    Navigator.pop(context);
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please fill all fields')),
+                  );
                 }
-              },
-              icon: const Icon(Icons.save)),
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Failed to update student: $e')),
+                );
+              }
+            },
+            icon: const Icon(Icons.save),
+          ),
         ],
       ),
-      body: Container(
+      body: Padding(
         padding: const EdgeInsets.all(5.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -83,10 +106,7 @@ class _EditStudentScreenState extends State<EditStudentScreen> {
                 labelText: 'Gender',
                 border: OutlineInputBorder(),
               ),
-              items: [
-                'F',
-                'M',
-              ].map<DropdownMenuItem<String>>((String value) {
+              items: ['F', 'M'].map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Row(
@@ -103,28 +123,32 @@ class _EditStudentScreenState extends State<EditStudentScreen> {
       ),
     );
   }
+
+  bool _validateInput() {
+    return nameController.text.isNotEmpty && dropdownValue.isNotEmpty;
+  }
 }
 
 Future<int> updateStudent(Student student) async {
-  final response = await http.put(
-    Uri.parse('http://192.168.149.209/api/student.php'),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(<String, String>{
-      'student_code': student.studentCode,
-      'student_name': student.studentName,
-      'gender': student.gender,
-    }),
-  );
+  try {
+    final response = await http.put(
+      Uri.parse('$apiBaseUrl/api/student.php'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'student_code': student.studentCode,
+        'student_name': student.studentName,
+        'gender': student.gender,
+      }),
+    );
 
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    return response.statusCode;
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to update student.');
+    if (response.statusCode == 200) {
+      return response.statusCode;
+    } else {
+      throw Exception('Failed to update student. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Failed to update student: $e');
   }
 }

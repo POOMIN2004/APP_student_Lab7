@@ -217,7 +217,7 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
 Future<List<ExamResult>> fetchExamResults(String courseCode) async {
   // ทำการดึงข้อมูลจาก server ตาม url ที่กำหนด
   final response = await http.get(Uri.parse(
-      'http://192.168.149.209/api/exam_result.php?course_code=$courseCode'));
+      'http://192.168.84.209/api/exam_result.php?course_code=$courseCode'));
 
   // เมื่อมีข้อมูลกลับมา
   if (response.statusCode == 200) {
@@ -240,7 +240,7 @@ List<ExamResult> parseExamResults(String responseBody) {
 Future<int> deleteExamResult(String student) async {
   final response = await http.delete(
     Uri.parse(
-        'http://192.168.149.209/api/exam_result.php?student_code=${student}'),
+        'http://192.168.84.209/api/exam_result.php?student_code=${student}'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
